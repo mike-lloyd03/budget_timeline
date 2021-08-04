@@ -2,15 +2,16 @@
 Tests for plot_data
 """
 from datetime import datetime
-from plot_data import make_timeline, round_float, plot_data_plotly, calculate_date
+from plot_data import make_timeline, round_float, plot_data, calculate_date
 
-test_data = [
-    {"description": "Current", "day": 0, "amount": 2000.00},
-    {"description": "Cell Phone", "day": 8, "amount": -80},
-    {"description": "Water Bill", "day": 3, "amount": -50},
-    {"description": "Savings", "day": 18, "amount": -100.00},
-    {"description": "Mortgage", "day": 1, "amount": -1555.56},
-    {"description": "Paycheck", "day": 15, "amount": 500.00},
+START_DATE = datetime(2015, 3, 7)
+TEST_DATA = [
+    {"description": "Current", "day": 0, "amount": 2000.00},  # 20150307
+    {"description": "Water Bill", "day": 3, "amount": -50},  # 20150403
+    {"description": "Savings", "day": 18, "amount": -100.00},  # 20150318
+    {"description": "Mortgage", "day": 1, "amount": -1555.56},  # 20150401
+    {"description": "Cell Phone", "day": 8, "amount": -80},  # 20150308
+    {"description": "Paycheck", "day": 15, "amount": 500.00},  # 20150315
 ]
 
 
@@ -18,28 +19,31 @@ def test_make_timeline():
     """
     Test make_timeline function
     """
-    start_date = datetime(2021, 1, 1)
-    expect_x = [0, 1, 3, 8, 15, 18]
-    expect_y = [2000, 444.44, 394.44, 314.44, 814.44, 714.44]
-    expect_desc = [
+    expect_dates = (
+        datetime(2015, 3, 7),
+        datetime(2015, 3, 8),
+        datetime(2015, 3, 15),
+        datetime(2015, 3, 18),
+        datetime(2015, 4, 1),
+        datetime(2015, 4, 3),
+    )
+    expect_amounts = (2000, 1920, 2420, 2320, 764.44, 714.44)
+    expect_desc = (
         "Current",
-        "Mortgage",
-        "Water Bill",
         "Cell Phone",
         "Paycheck",
         "Savings",
-    ]
-    expect_date = [
-        start_date,
-        datetime(2021, 1, 1),
-        datetime(2021, 1, 3),
-        datetime(2021, 1, 8),
-        datetime(2021, 1, 15),
-        datetime(2021, 1, 18),
-    ]
-    assert (expect_x, expect_y, expect_desc, expect_date) == make_timeline(
-        test_data, start_date
+        "Mortgage",
+        "Water Bill",
     )
+    expect_change = (2000, -80, 500, -100, -1555.56, -50)
+    expect = {
+        "Date": expect_dates,
+        "Amount Available": expect_amounts,
+        "Description": expect_desc,
+        "Change": expect_change,
+    }
+    assert expect == make_timeline(TEST_DATA, START_DATE)
 
 
 def test_round_float():
@@ -70,4 +74,4 @@ def test_calculate_date():
     assert calculate_date(datetime(2021, 1, 1), 1) == datetime(2021, 1, 1)
 
 
-# plot_data_plotly(test_data)
+# plot_data_plotly(test_data, datetime(2021, 8, 3))

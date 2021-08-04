@@ -1,30 +1,21 @@
 from datetime import datetime
 from calendar import monthrange
+
 import plotly.express as px
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set_theme()
 
 
-def plot_data(data_list):
-    """
-    Plots a list of transaction dictionaries
-    """
-    x_vals, y_vals, _ = make_timeline(data_list)
-    plt.plot(x_vals, y_vals)
-    plt.xlabel("Date")
-    plt.ylabel("Amount Available")
-    plt.show()
-
-
-def plot_data_plotly(data_list):
+def plot_data(data_list, start_date):
     """
     Plots data using Plotly
     """
-    x_vals, y_vals, descriptions = make_timeline(data_list)
-    data = {"Day": x_vals, "Amount Available": y_vals, "Description": descriptions}
-    fig = px.line(data, "Day", "Amount Available", hover_name="Description")
+    data = make_timeline(data_list, start_date)
+    fig = px.line(
+        data,
+        "Date",
+        "Amount Available",
+        hover_name=lambda d: data[]"Date",
+        hover_data=["Change", "Description"],
+    )
     fig.update_layout(yaxis_tickprefix="$")
     fig.show()
 
@@ -33,17 +24,29 @@ def make_timeline(data_list, start_date):
     """
     Converts a list of transaction dictionaries into lists of days and amounts.
     """
-    days = []
+    dates = []
     amounts = []
     descriptions = []
-    dates = []
-    for transaction in sorted(data_list, key=lambda t: t["day"]):
-        last_amount = amounts[-1] if len(amounts) > 0 else 0
-        days.append(transaction["day"])
-        amounts.append(round_float(last_amount + transaction["amount"]))
-        descriptions.append(transaction["description"])
+    changes = []
+
+    for transaction in data_list:
         dates.append(calculate_date(start_date, transaction["day"]))
-    return (days, amounts, descriptions, dates)
+        descriptions.append(transaction["description"])
+        changes.append(transaction["amount"])
+
+    sorted_lists = sorted(zip(dates, descriptions, changes))
+    dates, descriptions, changes = zip(*sorted_lists)
+
+    for change in zip(dates, changes):
+        last_amount = amounts[-1] if len(amounts) > 0 else 0
+        amounts.append(round_float(last_amount + change[1]))
+
+    return {
+        "Date": dates,
+        "Amount Available": tuple(amounts),
+        "Description": descriptions,
+        "Change": changes,
+    }
 
 
 def round_float(num, precision=2):
