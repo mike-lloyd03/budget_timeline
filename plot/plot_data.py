@@ -13,11 +13,11 @@ def plot_data(data_list, start_date):
         data,
         "Date",
         "Amount Available",
-        hover_name=lambda d: data[]"Date",
+        hover_name="Date",
         hover_data=["Change", "Description"],
     )
     fig.update_layout(yaxis_tickprefix="$")
-    fig.show()
+    fig.write_html("content/graph.html")
 
 
 def make_timeline(data_list, start_date):
@@ -80,4 +80,4 @@ def calculate_date(date, day):
     _, max_day_of_month = monthrange(year, month)
     day = day if day <= max_day_of_month else max_day_of_month
 
-    return datetime(year, month, day)
+    return datetime(year, month, day).date()

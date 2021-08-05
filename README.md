@@ -1,7 +1,10 @@
 # Budget Timeline
 
 ## Roadmap
-- [ ] Make plot of cash flow vs time
+- [x] Make plot of cash flow vs time
+    - [ ] Make dark mode
+    - [ ] Hovers could be better
+    - [ ] Have total change on each day and list what transactions happen on that day
 - [ ] Pull budget data from Google Sheet
 - [ ] Make Flask app (or maybe do this in Go?)
    - [ ] Add authentication
